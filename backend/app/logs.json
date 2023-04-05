@@ -2,8 +2,16 @@
     {
         "id": 1,
         "endpoint": "/nef/api/v1/3gpp-monitoring-event/v1/myNetapp/subscriptions",
-        "method": "GET",
-        "request_body": {},
+        "method": "POST",
+        "request_body": {
+            "externalId": "10002@domain.com",
+            "notificationDestination": "http://10.0.12.95:8888/api/v1/utils/monitoring/callback",
+            "monitoringType": "LOCATION_REPORTING",
+            "maximumNumberOfReports": "str",
+            "monitorExpireTime": "2022-10-18T15:17:40.497Z",
+            "maximumDetectionTime": 50,
+            "reachabilityType": "DATA"
+        },
         "scsAsId": "myNetapp",
         "afId": null,
         "subscriptionId": null,
@@ -11,52 +19,16 @@
         "configurationId": null,
         "provisioningId": null,
         "setId": null,
-        "nef_response_code": 204,
-        "nef_response_message": ""
-    },
-    {
-        "id": 2,
-        "endpoint": "/nef/api/v1/3gpp-monitoring-event/v1/myNetapp/subscriptions",
-        "method": "GET",
-        "request_body": {},
-        "scsAsId": "myNetapp",
-        "afId": null,
-        "subscriptionId": null,
-        "transactionId": null,
-        "configurationId": null,
-        "provisioningId": null,
-        "setId": null,
-        "nef_response_code": 204,
-        "nef_response_message": ""
-    },
-    {
-        "id": 3,
-        "endpoint": "/nef/api/v1/3gpp-monitoring-event/v1/myNetapp/subscriptions",
-        "method": "GET",
-        "request_body": {},
-        "scsAsId": "myNetapp",
-        "afId": null,
-        "subscriptionId": null,
-        "transactionId": null,
-        "configurationId": null,
-        "provisioningId": null,
-        "setId": null,
-        "nef_response_code": 204,
-        "nef_response_message": ""
-    },
-    {
-        "id": 4,
-        "endpoint": "/nef/api/v1/3gpp-monitoring-event/v1/myNetapp/subscriptions",
-        "method": "GET",
-        "request_body": {},
-        "scsAsId": "myNetapp",
-        "afId": null,
-        "subscriptionId": null,
-        "transactionId": null,
-        "configurationId": null,
-        "provisioningId": null,
-        "setId": null,
-        "nef_response_code": 204,
-        "nef_response_message": ""
+        "nef_response_code": 422,
+        "nef_response_message": [
+            {
+                "loc": [
+                    "body",
+                    "maximumNumberOfReports"
+                ],
+                "msg": "value is not a valid integer",
+                "type": "type_error.integer"
+            }
+        ]
     }
 ]

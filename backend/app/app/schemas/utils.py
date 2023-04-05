@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Extra
 from app import schemas
 from typing import List, Optional
 
@@ -8,3 +8,8 @@ class scenario(BaseModel):
     UEs: List[schemas.UECreate]
     paths: List[schemas.Path]
     ue_path_association: List[schemas.ue_path]
+
+class ExtraBaseModel(BaseModel):
+    
+    class Config:
+        extra = Extra.forbid

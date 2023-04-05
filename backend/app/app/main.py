@@ -7,8 +7,7 @@ import time
 # imports for UI
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
-from fastapi.responses import RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 
 # ================================= Main Application - NEF Emulator =================================
 app = FastAPI(title=settings.PROJECT_NAME,

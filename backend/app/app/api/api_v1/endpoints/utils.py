@@ -21,7 +21,6 @@ from fastapi import HTTPException, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.routing import APIRoute
 from json import JSONDecodeError
-from app.tools import compose_report_payload, create_http_response
 import logging.config
 
 #List holding notifications from 
@@ -308,6 +307,9 @@ class ReportLogging(APIRoute):
         
         original_route_handler = super().get_route_handler()
         async def custom_route_handler(request: Request) -> Response:
+
+            global logs_count
+
             try:               
                 # Capture Request's Body 
                 request_body = {}
@@ -315,8 +317,6 @@ class ReportLogging(APIRoute):
                     request_body = await request.json()
                 except JSONDecodeError: 
                     pass
-
-                global logs_count
 
                 query_params = {
                     'scsAsId': None,
@@ -366,14 +366,50 @@ class ReportLogging(APIRoute):
                 return response
             except RequestValidationError as exc:
                 status_code = 422 
-                body = await request.body()
-                detail = {"errors": exc.errors(), "body": body.decode()}
+
+                query_params = {
+                    'scsAsId': None,
+                    'afId': None,
+                    'subscriptionId': None,
+                    'transactionId': None,
+                    'configurationId': None,
+                    'provisioningId': None,
+                    'setId': None,
+                }
+                            
+                for param_name in query_params:
+                    if param_name in request.query_params:
+                        query_params[param_name] = request.query_params[param_name]
+
+                extra_fields = {
+                    'endpoint': request.url.path,
+                    'method': request.method,
+                    'request_body': exc.body,
+                    **query_params,
+                    'nef_response_code': status_code,
+                    'nef_response_message': exc.errors(),
+                }
+
+                logs_count += 1
+
+                log_entry = {
+                    'id': logs_count,
+                    **extra_fields
+                }
                 
-                # Errors
-                logging.error(f"Error Detail: {detail}")
-                logging.error(f"Error status_code: {status_code}")
+                listObj = []
+                # Read JSON file
+                with open('logs.json') as fp:
+                    listObj = json.load(fp)
+
+                listObj.append(log_entry)
+
+                with open('logs.json', 'w') as json_file:
+                    json.dump(listObj, json_file, 
+                        indent=4,  
+                        separators=(',',': '))
                 
-                raise HTTPException(status_code=status_code, detail=detail)
+                raise HTTPException(status_code=status_code, detail= exc.errors())
 
         return custom_route_handler
     
