@@ -13,9 +13,29 @@ from pydantic import BaseModel
 from app.api.api_v1.endpoints.paths import get_random_point
 from app.api.api_v1.endpoints.ue_movement import retrieve_ue_state
 
+import logging
+from fastapi.routing import APIRouter
+from typing import Callable
+import json
+from fastapi import HTTPException, Request, Response
+from fastapi.exceptions import RequestValidationError
+from fastapi.routing import APIRoute
+from json import JSONDecodeError
+from app.tools import compose_report_payload, create_http_response
+import logging.config
+
 #List holding notifications from 
 event_notifications = []
 counter = 0
+
+logs_count = 0
+
+# create an empty JSON object
+data = []
+
+# open a file and write the empty JSON object to it  -- bind mount file
+with open("logs.json", "w") as f:
+    json.dump(data, f, indent=2)
 
 def add_notifications(request: Request, response: JSONResponse, is_notification: bool):
 
@@ -280,3 +300,80 @@ def get_last_notifications(
         skipped_items += 1
     
     return updated_notification
+
+
+class ReportLogging(APIRoute):
+
+    def get_route_handler(self) -> Callable:
+        
+        original_route_handler = super().get_route_handler()
+        async def custom_route_handler(request: Request) -> Response:
+            try:               
+                # Capture Request's Body 
+                request_body = {}
+                try: 
+                    request_body = await request.json()
+                except JSONDecodeError: 
+                    pass
+
+                global logs_count
+
+                query_params = {
+                    'scsAsId': None,
+                    'afId': None,
+                    'subscriptionId': None,
+                    'transactionId': None,
+                    'configurationId': None,
+                    'provisioningId': None,
+                    'setId': None,
+                }
+                
+                for param_name in query_params:
+                    if param_name in request.query_params:
+                        query_params[param_name] = request.query_params[param_name]
+
+                # Capture Request's Response
+                response = await original_route_handler(request)   
+
+                extra_fields = {
+                    'endpoint': request.url.path,
+                    'method': request.method,
+                    'request_body': request_body,
+                    **query_params,
+                    'nef_response_code': response.status_code,
+                    'nef_response_message': response.body.decode(response.charset).replace('"', "'"),
+                }
+
+                logs_count += 1
+
+                log_entry = {
+                    'id': logs_count,
+                    **extra_fields
+                }
+                
+                listObj = []
+                # Read JSON file
+                with open('logs.json') as fp:
+                    listObj = json.load(fp)
+
+                listObj.append(log_entry)
+
+                with open('logs.json', 'w') as json_file:
+                    json.dump(listObj, json_file, 
+                        indent=4,  
+                        separators=(',',': '))
+
+                return response
+            except RequestValidationError as exc:
+                status_code = 422 
+                body = await request.body()
+                detail = {"errors": exc.errors(), "body": body.decode()}
+                
+                # Errors
+                logging.error(f"Error Detail: {detail}")
+                logging.error(f"Error status_code: {status_code}")
+                
+                raise HTTPException(status_code=status_code, detail=detail)
+
+        return custom_route_handler
+    

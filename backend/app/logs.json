@@ -1,0 +1,62 @@
+[
+    {
+        "id": 1,
+        "endpoint": "/nef/api/v1/3gpp-monitoring-event/v1/myNetapp/subscriptions",
+        "method": "GET",
+        "request_body": {},
+        "scsAsId": "myNetapp",
+        "afId": null,
+        "subscriptionId": null,
+        "transactionId": null,
+        "configurationId": null,
+        "provisioningId": null,
+        "setId": null,
+        "nef_response_code": 204,
+        "nef_response_message": ""
+    },
+    {
+        "id": 2,
+        "endpoint": "/nef/api/v1/3gpp-monitoring-event/v1/myNetapp/subscriptions",
+        "method": "GET",
+        "request_body": {},
+        "scsAsId": "myNetapp",
+        "afId": null,
+        "subscriptionId": null,
+        "transactionId": null,
+        "configurationId": null,
+        "provisioningId": null,
+        "setId": null,
+        "nef_response_code": 204,
+        "nef_response_message": ""
+    },
+    {
+        "id": 3,
+        "endpoint": "/nef/api/v1/3gpp-monitoring-event/v1/myNetapp/subscriptions",
+        "method": "GET",
+        "request_body": {},
+        "scsAsId": "myNetapp",
+        "afId": null,
+        "subscriptionId": null,
+        "transactionId": null,
+        "configurationId": null,
+        "provisioningId": null,
+        "setId": null,
+        "nef_response_code": 204,
+        "nef_response_message": ""
+    },
+    {
+        "id": 4,
+        "endpoint": "/nef/api/v1/3gpp-monitoring-event/v1/myNetapp/subscriptions",
+        "method": "GET",
+        "request_body": {},
+        "scsAsId": "myNetapp",
+        "afId": null,
+        "subscriptionId": null,
+        "transactionId": null,
+        "configurationId": null,
+        "provisioningId": null,
+        "setId": null,
+        "nef_response_code": 204,
+        "nef_response_message": ""
+    }
+]
