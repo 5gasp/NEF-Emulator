@@ -1,10 +1,10 @@
 from datetime import datetime
 import logging, requests, json
-from typing import Any
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from typing import Any, Callable
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from fastapi.exceptions import HTTPException
+from fastapi.exceptions import HTTPException, RequestValidationError
 from sqlalchemy.orm.session import Session
 from app import models, schemas, crud
 from app.api import deps
@@ -12,29 +12,14 @@ from app.schemas import monitoringevent, UserPlaneNotificationData
 from pydantic import BaseModel
 from app.api.api_v1.endpoints.paths import get_random_point
 from app.api.api_v1.endpoints.ue_movement import retrieve_ue_state
-
-import logging
-from fastapi.routing import APIRouter
-from typing import Callable
-import json
-from fastapi import HTTPException, Request, Response
-from fastapi.exceptions import RequestValidationError
 from fastapi.routing import APIRoute
 from json import JSONDecodeError
-import logging.config
 
 #List holding notifications from 
 event_notifications = []
 counter = 0
 
 logs_count = 0
-
-# create an empty JSON object
-data = []
-
-# open a file and write the empty JSON object to it  -- bind mount file
-with open("logs.json", "w") as f:
-    json.dump(data, f, indent=2)
 
 def add_notifications(request: Request, response: JSONResponse, is_notification: bool):
 
@@ -353,12 +338,12 @@ class ReportLogging(APIRoute):
                 
                 listObj = []
                 # Read JSON file
-                with open('logs.json') as fp:
+                with open('../shared/report.json') as fp:
                     listObj = json.load(fp)
 
                 listObj.append(log_entry)
 
-                with open('logs.json', 'w') as json_file:
+                with open('../shared/report.json', 'w') as json_file:
                     json.dump(listObj, json_file, 
                         indent=4,  
                         separators=(',',': '))
@@ -399,12 +384,12 @@ class ReportLogging(APIRoute):
                 
                 listObj = []
                 # Read JSON file
-                with open('logs.json') as fp:
+                with open('../shared/report.json') as fp:
                     listObj = json.load(fp)
 
                 listObj.append(log_entry)
 
-                with open('logs.json', 'w') as json_file:
+                with open('../shared/report.json', 'w') as json_file:
                     json.dump(listObj, json_file, 
                         indent=4,  
                         separators=(',',': '))
