@@ -9,9 +9,10 @@ from app.api import deps
 from app.api.api_v1.endpoints.utils import retrieve_ue_state
 from app.api.api_v1.endpoints.paths import get_random_point
 from app.api.api_v1.endpoints.ue_movement import retrieve_ue, retrieve_ue_distances, retrieve_ue_path_losses, retrieve_ue_rsrps
+from .utils import ReportLogging
 
 router = APIRouter()
-
+router.route_class = ReportLogging
 
 @router.get("", response_model=List[schemas.UEhex])
 def read_UEs(
@@ -164,6 +165,10 @@ def read_UE_serving_cell(*,
         raise HTTPException(status_code=404, detail="UE not found")
     if not crud.user.is_superuser(current_user) and (UE.owner_id != current_user.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
+
+    if retrieve_ue(supi) == None:
+        raise HTTPException(status_code=400, detail="The emulation needs to be ongoing")
+
     log = {
         "latitude":retrieve_ue(supi)["latitude"],
         "longitude": retrieve_ue(supi)["longitude"],

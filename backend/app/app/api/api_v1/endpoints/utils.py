@@ -64,6 +64,7 @@ def add_notifications(request: Request, response: JSONResponse, is_notification:
     return json_data
     
 router = APIRouter()
+# router.route_class = ReportLogging
 
 @router.get("/export/scenario", response_model=schemas.scenario)
 def get_scenario(
@@ -286,7 +287,6 @@ def get_last_notifications(
     
     return updated_notification
 
-
 class ReportLogging(APIRoute):
 
     def get_route_handler(self) -> Callable:
@@ -443,4 +443,3 @@ class ReportLogging(APIRoute):
                 raise HTTPException(status_code=exc.status_code, detail=exc.detail)
 
         return custom_route_handler
-    

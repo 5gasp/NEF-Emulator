@@ -4,9 +4,10 @@ from sqlalchemy.orm import Session
 from app import crud, models, schemas
 from app.api import deps
 from app.api.api_v1.endpoints.utils import retrieve_ue_state
+from .utils import ReportLogging
 
 router = APIRouter()
-
+router.route_class = ReportLogging
 
 @router.get("", response_model=List[schemas.Cell])
 def read_Cells(
