@@ -13,8 +13,6 @@ services:
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
 
-
-
   pgadmin:
     image: dpage/pgadmin4
     profiles: ["debug"]
@@ -53,22 +51,35 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo:27017/
       ME_CONFIG_MONGODB_ENABLE_ADMIN: "${MONGO_EXPRESS_ENABLE_ADMIN}"
 
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  producer:
+    image: '${DOCKER_IMAGE_PRODUCER?Variable not set}:${TAG-latest}'
+    profiles: ["debug", "dev"]
+    restart: unless-stopped
+    depends_on:
+      - rabbitmq
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.producer
   
   report:
     image: '${DOCKER_IMAGE_REPORT?Variable not set}:${TAG-latest}'
     profiles: ["debug", "dev"]
-    
     ports:
       - "3000:3000"
     volumes:
       - shared-data:/shared
     env_file:
       - .env
-    
     build:
       context: ./backend
       dockerfile: Dockerfile.report
-    
     
   backend:
     image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
@@ -94,10 +105,6 @@ services:
         INSTALL_JUPYTER: ${INSTALL_JUPYTER-true}
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
-
-
-
 
 volumes:
   app-db-data:
