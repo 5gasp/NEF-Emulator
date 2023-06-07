@@ -2,7 +2,7 @@
 # @Author: Rafael Direito
 # @Date:   2023-05-22 11:50:38
 # @Last Modified by:   Rafael Direito
-# @Last Modified time: 2023-06-07 20:18:39
+# @Last Modified time: 2023-06-07 20:25:51
 from typing import Any
 from fastapi import Request, FastAPI
 from fastapi.responses import JSONResponse, FileResponse
@@ -12,7 +12,10 @@ import json
 
 # On Boot, create the Report File
 if not os.path.exists("../shared/report.json"):
-    open('../shared/report.json', 'w').close()
+   with open("../shared/report.json" 'x') as jsonFile:
+        data = []
+        json.dump(data, jsonFile, indent=2)
+    
     
 
 app = FastAPI()
