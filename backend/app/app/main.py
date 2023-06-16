@@ -3,6 +3,7 @@ from starlette.middleware.cors import CORSMiddleware
 from app.api.api_v1.api import api_router, nef_router
 from app.core.config import settings
 import time
+import pathlib
 
 # imports for UI
 from fastapi.staticfiles import StaticFiles
@@ -44,11 +45,13 @@ async def add_process_time_header(request: Request, call_next):
 
 # ================================= Static Page routes =================================
 
+app_path = pathlib.Path(__file__).parent.resolve()
+
 # static files folder
-app.mount("/static", StaticFiles(directory="/app/app/static"), name="static")
+app.mount("/static", StaticFiles(directory= "%s/static" % app_path), name="static")
 
 # templates folder
-templates = Jinja2Templates(directory="/app/app/ui")
+templates = Jinja2Templates(directory= "%s/ui" % app_path)
 
 
 @app.get("/login", response_class=HTMLResponse)

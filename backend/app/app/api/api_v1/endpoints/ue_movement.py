@@ -13,6 +13,7 @@ from app.api import deps
 from app.schemas import Msg
 from app.tools import monitoring_callbacks, timer
 from sqlalchemy.orm import Session
+from app.core.config import settings
 
 #Dictionary holding threads that are running per user id.
 threads = {}
@@ -149,6 +150,34 @@ class BackgroundTasks(threading.Thread):
                     # cell_now = check_distance(UE.latitude, UE.longitude, json_cells) #calculate the distance from all the cells
                     ues[f"{supi}"]["latitude"] = points[current_position_index]["latitude"]
                     ues[f"{supi}"]["longitude"] = points[current_position_index]["longitude"]
+
+                    # q1 = 'rate(wds_value_rx_bytes_ok{job="ue_statistics"}[1m])'
+                    # q2 = 'rate(wds_value_tx_bytes_ok{job="ue_statistics"}[1m])'
+                    q1 = 'rate(collectd_snmp_if_octets_rx_total{snmp="te-1_1_6"}[5m])*8'
+                    q2 = 'rate(collectd_snmp_if_octets_tx_total{snmp="te-1_1_6"}[5m])*8'
+                    prometheus = settings.PROMETHEUS
+                    prometheus_token = settings.PROMETHEUS_TOKEN
+                    payload = {}
+                    headers = {
+                    'Authorization': 'Basic %s' % prometheus_token
+                    }
+                    uplink = 0
+                    downlink = 0
+
+                    response = requests.request("GET", '%s?query=%s' % (prometheus, q1), headers=headers, data=payload, timeout=(3.05, 27))         
+                    print(response)
+                    if(len(response.json()['data']['result'])):
+                        downlink = response.json()['data']['result'][0]['value'][1]
+                        downlink = int(float(downlink))
+                    
+                    response = requests.request("GET", '%s?query=%s' %  (prometheus, q2), headers=headers, data=payload, timeout=(3.05, 27))
+                    if(len(response.json()['data']['result'])):
+                        uplink = response.json()['data']['result'][0]['value'][1]
+                        uplink = int(float(uplink))
+                    
+                    ues[f"{supi}"]["uplink"] = uplink
+                    ues[f"{supi}"]["downlink"] = downlink
+                 
                     cell_now, distances_now = check_distance(ues[f"{supi}"]["latitude"], ues[f"{supi}"]["longitude"], json_cells) #calculate the distance from all the cells
                     distances[f"{supi}"] = distances_now
                     path_losses_now = check_path_loss(ues[f"{supi}"]["latitude"], ues[f"{supi}"]["longitude"], json_cells)

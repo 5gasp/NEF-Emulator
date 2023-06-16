@@ -40,3 +40,6 @@ MONGO_PASSWORD=pass
 
 # MongoExpress
 MONGO_EXPRESS_ENABLE_ADMIN=true
+
+PROMETHEUS = "https://portal.5gasp.eu/prometheus/api/v1/query"
+PROMETHEUS_TOKEN = XXXXXX
