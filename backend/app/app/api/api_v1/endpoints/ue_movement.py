@@ -269,7 +269,11 @@ class BackgroundTasks(threading.Thread):
                         
                         logging.warning(f"UE({UE.supi}) with ipv4 {UE.ip_address_v4} handovers to Cell {cell_now.get('id')}, {cell_now.get('description')}")
                         
-                        handovers[f"{UE.supi}"]= cell_now.get('id')
+                        if f"{UE.supi}" not in handovers.keys():
+                            handovers[f"{UE.supi}"] = []
+                            
+
+                        handovers[f"{UE.supi}"].append(cell_now.get('id'))
 
                         ues[f"{supi}"]["Cell_id"] = cell_now.get('id')
                         ues[f"{supi}"]["cell_id_hex"] = cell_now.get('cell_id')
@@ -500,8 +504,10 @@ def retrieve_ue_rsrps(supi: str) -> dict:
     return rsrps.get(supi)
 
 def retrieve_ue_handovers(supi: str) -> dict:
-    print(handovers)
-    return handovers.get(supi)
+    result = handovers.get(supi)
+    if result != None:
+        return handovers.get(supi)
+    return []
 
 def monitoring_event_sub_validation(sub: dict, is_superuser: bool, current_user_id: int, owner_id) -> bool:
     
