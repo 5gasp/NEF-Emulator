@@ -24,4 +24,4 @@ nef_router.include_router(endpoints.qosMonitoring.router, prefix="/3gpp-as-sessi
 
     # ---Create a subapp---
 tests_router = APIRouter()
-tests_router.include_router(endpoints.tests.router, prefix="/test", tags=["Test API"])
+tests_router.include_router(endpoints.tests.router, prefix="/UEs", tags=["Test API"])
