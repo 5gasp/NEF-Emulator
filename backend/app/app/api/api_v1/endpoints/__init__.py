@@ -9,3 +9,4 @@ from .UE import router
 from .qosInformation import router
 from .qosMonitoring import router
 from .monitoringevent import router
+from .statistics import router
