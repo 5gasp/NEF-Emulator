@@ -14,13 +14,14 @@ from .qosInformation import qos_reference_match
 from enum import Enum
 from app.core.config import settings
 import requests
+from app.tools.prometheus import Prometheus
+
 router = APIRouter()
 db_collection= 'Statistics'
 
 
-
-@router.get("/{scsAsId}/metrics",response_model=schemas.statistics.Metrics)
-def read_available_metrics(
+@router.get("/{scsAsId}/metrics",response_model=schemas.Metrics)
+async def read_available_metrics(
     *,
     scsAsId: str = Path(..., title="The ID of the Netapp that creates a subscription", example="myNetapp"),
     current_user: models.User = Depends(deps.get_current_active_user),
@@ -29,28 +30,37 @@ def read_available_metrics(
     """
     Get subscription by id
     """
-    #print(schemas.statistics.Metrics)
-    return schemas.statistics.Metrics.__dict__
+    prometheus = Prometheus()
 
-@router.get("/{scsAsId}/metric/{query}")
+    http_response = JSONResponse(content=prometheus.getMetrics(), status_code=200,)
+    return http_response
+
+@router.post("/{scsAsId}/metric", response_model=schemas.Response)
 def read_metric(
     *,
     scsAsId: str = Path(..., title="The ID of the Netapp that creates a subscription", example="myNetapp"),
-    query : str = Path(...,title="The query for the desired metric", example="5GASP Network"),
+    item_in: schemas.Metric,
     current_user: models.User = Depends(deps.get_current_active_user),
     http_request: Request
 ) -> Any:
     """
     Get subscription by id
     """
-    prometheus = settings.PROMETHEUS
     prometheus_token = settings.PROMETHEUS_TOKEN
     payload = {}
     headers = {
     'Authorization': 'Basic %s' % prometheus_token
     }
-    response = requests.request("GET", '%s?query=%s' % (prometheus, query), headers=headers, data=payload, timeout=(3.05, 27))   
-    if(response.status_code != 200):        
-        raise HTTPException(status_code=response.status_code, detail=response.json())
-    
-    return  response.json()
+    prometheus = Prometheus()
+    metric = item_in.metric
+    query = prometheus.query(metric=metric)
+    if query:
+        response = requests.request("GET", '%s?query=%s' % (settings.PROMETHEUS, query), headers=headers, data=payload, timeout=(3.05, 27))   
+        if(response.status_code != 200):        
+            raise HTTPException(status_code=response.status_code, detail=response.json())
+
+        result = prometheus.response(response.json(),metric=metric)
+
+        return result
+    else:
+        return JSONResponse(content={"message" : "Metric not available"},status_code=404)

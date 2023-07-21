@@ -8,4 +8,4 @@ from .UE import UE, UECreate, UEUpdate, Speed, ue_path, UEhex
 from .monitoringevent import MonitoringEventSubscriptionCreate, MonitoringEventSubscription, MonitoringEventReport, MonitoringEventReportReceived, MonitoringNotification
 from .qosMonitoring import AsSessionWithQoSSubscriptionCreate, AsSessionWithQoSSubscription, UserPlaneNotificationData
 from .utils import scenario
-from .statistics import StatisticsReport, Metrics
+from .statistics import  Metrics, Response, Metric, MetricsEnum
