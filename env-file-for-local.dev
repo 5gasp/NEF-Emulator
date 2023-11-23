@@ -43,4 +43,4 @@ MONGO_PASSWORD=pass
 MONGO_EXPRESS_ENABLE_ADMIN=true
 
 #Report
-REPORT_PATH=../shared/report.json
+REPORT_PATH=/shared/report.json
