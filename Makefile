@@ -1,5 +1,11 @@
 SHELL := /bin/bash
 
+# Function to determine Docker Compose command
+define docker_compose_cmd
+	$(if $(shell command -v docker-compose 2> /dev/null),docker-compose,$(if $(shell command -v docker compose 2> /dev/null),docker compose,))
+endef
+
+
 # Prepare DEVELOPMENT environment
 
 prepare-dev-env:
@@ -9,40 +15,40 @@ prepare-dev-env:
 # docker-compose TASKS
 
 up:
-	docker-compose --profile dev up
+	$(call docker_compose_cmd) --profile dev up
 
 upd:
-	docker-compose --profile dev up -d
+	docker compose --profile dev up -d
 
 debug-up:
-	docker-compose --profile debug up
+	$(call docker_compose_cmd) --profile debug up
 
 debug-upd:
-	docker-compose --profile debug up -d
+	$(call docker_compose_cmd) --profile debug up -d
 
 down:
-	docker-compose down
+	$(call docker_compose_cmd) --profile devdown
 
 down-v: # also removes volumes
-	docker-compose down -v
+	$(call docker_compose_cmd) --profile dev down -v
 
 stop:
-	docker-compose stop
+	$(call docker_compose_cmd) stop
 
 build:
-	docker-compose --profile debug build
+	$(call docker_compose_cmd) --profile debug build
 
 build-no-cache:
-	docker-compose --profile debug build --no-cache
+	$(call docker_compose_cmd) --profile debug build --no-cache
 
 logs:
-	docker-compose logs -f
+	$(call docker_compose_cmd) logs -f
 
 logs-backend:
-	docker-compose logs -f backend
+	$(call docker_compose_cmd) logs -f backend
 
 logs-mongo:
-	docker-compose logs -f mongo
+	$(call docker_compose_cmd) logs -f mongo
 
 ps:
 	docker ps -a
@@ -62,8 +68,8 @@ db-init: #simple scenario with 3 UEs, 3 Cells, 1 gNB
 
 
 db-reset:
-	docker-compose exec db psql -h localhost -U postgres -d app -c 'TRUNCATE TABLE cell, gnb, monitoring, path, points, ue RESTART IDENTITY;'
-	docker-compose exec mongo /bin/bash -c 'mongo fastapi -u $$MONGO_USER -p $$MONGO_PASSWORD --authenticationDatabase admin --eval "db.dropDatabase();"'
+	$(call docker_compose_cmd) exec db psql -h localhost -U postgres -d app -c 'TRUNCATE TABLE cell, gnb, monitoring, path, points, ue RESTART IDENTITY;'
+	$(call docker_compose_cmd) exec mongo /bin/bash -c 'mongo fastapi -u $$MONGO_USER -p $$MONGO_PASSWORD --authenticationDatabase admin --eval "db.dropDatabase();"'
 
 
 db-reinit: db-reset db-init
@@ -72,4 +78,4 @@ db-reinit: db-reset db-init
 #Individual logs
 
 logs-location:
-	docker-compose logs -f backend 2>&1 | grep -E "(handovers|monitoringType|'ack')"
+	$(call docker_compose_cmd) logs -f backend 2>&1 | grep -E "(handovers|monitoringType|'ack')"

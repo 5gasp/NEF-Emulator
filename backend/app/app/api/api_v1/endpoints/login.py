@@ -4,6 +4,7 @@ from typing import Any
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from .utils import ReportLogging
 
 from app import crud, models, schemas
 from app.api import deps
@@ -17,6 +18,7 @@ from app.utils import (
 )
 
 router = APIRouter()
+router.route_class = ReportLogging
 
 
 @router.post("/login/access-token", response_model=schemas.Token)

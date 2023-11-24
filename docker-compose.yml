@@ -1,3 +1,7 @@
+# @Author: Rafael Direito
+# @Date:   2023-05-22 11:50:38
+# @Last Modified by:   Rafael Direito
+# @Last Modified time: 2023-05-22 11:53:38
 version: "3.9"
 
 services:
@@ -12,8 +16,6 @@ services:
       - .env
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
-
-
 
   pgadmin:
     image: dpage/pgadmin4
@@ -52,8 +54,26 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: "${MONGO_PASSWORD}"
       ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo:27017/
       ME_CONFIG_MONGODB_ENABLE_ADMIN: "${MONGO_EXPRESS_ENABLE_ADMIN}"
-
   
+  report:
+    image: '${DOCKER_IMAGE_REPORT?Variable not set}:${TAG-latest}'
+    profiles: ["debug", "dev"]
+    ports:
+      - "3000:3000"
+    volumes:
+      - shared-data:/shared
+    env_file:
+      - .env
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.report
+    healthcheck:
+      test: curl --fail http://localhost:3000/ || exit 1
+      interval: 10s
+      timeout: 30s
+      retries: 3
+      start_period: 5s
+
   backend:
     image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
     profiles: ["debug", "dev"]
@@ -62,6 +82,7 @@ services:
       - "${SERVER_PORT}:80"
     volumes:
       - ./backend/app:/app
+      - shared-data:/shared
     env_file:
       - .env
     environment:
@@ -77,13 +98,12 @@ services:
         INSTALL_JUPYTER: ${INSTALL_JUPYTER-true}
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
-
-
-
+    depends_on:
+      report:
+        condition: service_healthy
 
 volumes:
   app-db-data:
   pgadmin-data:
   app-mongo-db-data:
-
+  shared-data:

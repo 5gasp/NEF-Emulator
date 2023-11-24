@@ -2,10 +2,24 @@
 
 PORT=8888
 URL=http://localhost
+REPORT_PORT=3000
 
 set -a # automatically export all variables
 source .env
 set +a
+
+printf '\n==================================================\n'
+printf 'Create Report'
+printf '\n==================================================\n'
+
+
+curl -X 'POST' \
+  "${URL}:${REPORT_PORT}/report" \
+
+
+printf '\n==================================================\n'
+printf 'Create Token for login'
+printf '\n==================================================\n'
 
 
 TOKEN=$(curl -X 'POST' \
@@ -441,5 +455,14 @@ curl -X 'POST' \
   "supi": "202010000000003",
   "path": 2
 }'
+
+
+printf '\n==================================================\n'
+printf 'Delete Report'
+printf '\n==================================================\n'
+
+
+curl -X 'DELETE' \
+  "${URL}:${REPORT_PORT}/report" \
 
 printf '\n==================================================\n\n'

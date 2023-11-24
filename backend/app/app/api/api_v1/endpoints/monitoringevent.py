@@ -11,8 +11,10 @@ from app import tools
 from app.db.session import client
 from app.api.api_v1.endpoints.utils import add_notifications
 from .ue_movement import retrieve_ue_state, retrieve_ue
+from .utils import ReportLogging
 
 router = APIRouter()
+router.route_class = ReportLogging
 db_collection= 'MonitoringEvent'
 
 @router.get("/{scsAsId}/subscriptions", response_model=List[schemas.MonitoringEventSubscription], responses={204: {"model" : None}})

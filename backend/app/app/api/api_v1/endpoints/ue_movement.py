@@ -29,6 +29,8 @@ path_losses = {}
 #Dictionary holding UEs' path losses in reference to cells
 rsrps = {}
 
+handovers = {}
+
 class BackgroundTasks(threading.Thread):
 
     def __init__(self, group=None, target=None, name=None, args=(), kwargs=None): 
@@ -67,7 +69,7 @@ class BackgroundTasks(threading.Thread):
             
             #Insert running UE in the dictionary
 
-            global ues, distances
+            global ues, distances, handovers
             ues[f"{supi}"] = jsonable_encoder(UE)
             ues[f"{supi}"].pop("id")
 
@@ -266,6 +268,13 @@ class BackgroundTasks(threading.Thread):
                         
                         
                         logging.warning(f"UE({UE.supi}) with ipv4 {UE.ip_address_v4} handovers to Cell {cell_now.get('id')}, {cell_now.get('description')}")
+                        
+                        if f"{UE.supi}" not in handovers.keys():
+                            handovers[f"{UE.supi}"] = []
+                            
+
+                        handovers[f"{UE.supi}"].append(cell_now.get('id'))
+
                         ues[f"{supi}"]["Cell_id"] = cell_now.get('id')
                         ues[f"{supi}"]["cell_id_hex"] = cell_now.get('cell_id')
                         gnb = crud.gnb.get(db=self._db, id=cell_now.get("gNB_id"))
@@ -493,6 +502,12 @@ def retrieve_ue_path_losses(supi: str) -> dict:
 
 def retrieve_ue_rsrps(supi: str) -> dict:
     return rsrps.get(supi)
+
+def retrieve_ue_handovers(supi: str) -> dict:
+    result = handovers.get(supi)
+    if result != None:
+        return handovers.get(supi)
+    return []
 
 def monitoring_event_sub_validation(sub: dict, is_superuser: bool, current_user_id: int, owner_id) -> bool:
     

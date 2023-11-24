@@ -6,9 +6,10 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
+from .utils import ReportLogging
 
 router = APIRouter()
-
+router.route_class = ReportLogging
 
 @router.get("", response_model=List[schemas.gNB])
 def read_gNBs(

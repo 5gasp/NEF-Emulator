@@ -7,4 +7,4 @@ from .Cell import Cell, CellCreate, CellInDB, CellUpdate
 from .UE import UE, UECreate, UEUpdate, Speed, ue_path, UEhex
 from .monitoringevent import MonitoringEventSubscriptionCreate, MonitoringEventSubscription, MonitoringEventReport, MonitoringEventReportReceived, MonitoringNotification
 from .qosMonitoring import AsSessionWithQoSSubscriptionCreate, AsSessionWithQoSSubscription, UserPlaneNotificationData
-from .utils import scenario
+from .utils import scenario, ExtraBaseModel

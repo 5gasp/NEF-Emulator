@@ -9,9 +9,10 @@ from app import crud, models, schemas
 from app.api import deps
 from app.core.config import settings
 from app.utils import send_new_account_email
+from .utils import ReportLogging
 
 router = APIRouter()
-
+router.route_class = ReportLogging
 
 @router.get("", response_model=List[schemas.User])
 def read_users(

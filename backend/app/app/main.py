@@ -1,14 +1,13 @@
 from fastapi import FastAPI, Request
 from starlette.middleware.cors import CORSMiddleware
-from app.api.api_v1.api import api_router, nef_router
+from app.api.api_v1.api import api_router, nef_router, tests_router
 from app.core.config import settings
 import time
 
 # imports for UI
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
-from fastapi.responses import RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 
 # ================================= Main Application - NEF Emulator =================================
 app = FastAPI(title=settings.PROJECT_NAME,
@@ -41,6 +40,12 @@ async def add_process_time_header(request: Request, call_next):
     process_time = time.time() - start_time
     response.headers["X-Process-Time"] = str(process_time)
     return response
+
+# ================================= Sub Application - Test APIs =================================
+
+testapi = FastAPI(title="Test APIs", openapi_prefix="/test")
+testapi.include_router(tests_router, prefix=settings.API_V1_STR)
+app.mount("/test", testapi)
 
 # ================================= Static Page routes =================================
 

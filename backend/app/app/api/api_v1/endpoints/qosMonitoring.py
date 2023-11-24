@@ -11,8 +11,10 @@ from app.crud import crud_mongo, user, ue
 from app.db.session import client
 from .utils import add_notifications
 from .qosInformation import qos_reference_match
+from .utils import ReportLogging
 
 router = APIRouter()
+router.route_class = ReportLogging
 db_collection= 'QoSMonitoring'
 
 @router.get("/{scsAsId}/subscriptions", response_model=List[schemas.AsSessionWithQoSSubscription])

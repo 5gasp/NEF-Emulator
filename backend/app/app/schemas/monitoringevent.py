@@ -2,15 +2,16 @@ from typing import Optional
 from datetime import datetime
 from pydantic import BaseModel, Field, IPvAnyAddress, AnyHttpUrl
 from enum import Enum
+from .utils import ExtraBaseModel
 
 # Shared properties | used for request body in endpoint/items.py
 #We can declare a UserBase model that serves as a base for our other models. And then we can make subclasses of that model that inherit its attributes
 
-class PlmnId(BaseModel):
+class PlmnId(ExtraBaseModel):
     mcc: int
     mnc: int
 
-class LocationInfo(BaseModel):
+class LocationInfo(ExtraBaseModel):
     cellId: Optional[str] = None
     enodeBId: Optional[str] = None
 #    routingAreaId: Optional[str] = None
@@ -27,7 +28,7 @@ class ReachabilityType(str, Enum):
     sms = "SMS"
     data = "DATA"
 
-class MonitoringEventReport(BaseModel):
+class MonitoringEventReport(ExtraBaseModel):
 #    msisdn: Optional[str] = None
     externalId: Optional[str] = Field("123456789@domain.com", description="Globally unique identifier containing a Domain Identifier and a Local Identifier. \<Local Identifier\>@\<Domain Identifier\>")
     monitoringType: MonitoringType
@@ -35,7 +36,7 @@ class MonitoringEventReport(BaseModel):
     ipv4Addr: Optional[IPvAnyAddress] = Field(None, description="String identifying an Ipv4 address")
     
 
-class MonitoringEventSubscriptionCreate(BaseModel):
+class MonitoringEventSubscriptionCreate(ExtraBaseModel):
     # mtcProviderId: Optional[str] = Field(None, description="Identifies the MTC Service Provider and/or MTC Application")
     externalId: Optional[str] = Field("123456789@domain.com", description="Globally unique identifier containing a Domain Identifier and a Local Identifier. \<Local Identifier\>@\<Domain Identifier\>")
     # msisdn: Optional[str] = Field("918369110173", description="Mobile Subscriber ISDN number that consists of Country Code, National Destination Code and Subscriber Number.")
@@ -62,5 +63,5 @@ class MonitoringNotification(MonitoringEventReport):
     lossOfConnectReason: Optional[int] = Field(None, description= "According to 3GPP TS 29.522 the lossOfConnectReason attribute shall be set to 6 if the UE is deregistered, 7 if the maximum detection timer expires or 8 if the UE is purged")
     reachabilityType: Optional[ReachabilityType] = Field("DATA", description="If monitoringType is \"UE_REACHABILITY\", this parameter shall be included to identify whether the request is for \"Reachability for SMS\" or \"Reachability for Data\"")
 
-class MonitoringEventReportReceived(BaseModel):
+class MonitoringEventReportReceived(ExtraBaseModel):
     ok: bool
