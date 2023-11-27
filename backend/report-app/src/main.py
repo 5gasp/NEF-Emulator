@@ -41,8 +41,8 @@ def create_report(
     filename: str = 'report.json',
     http_request: Request
 ) -> Any:
-    if not os.path.exists(os.path.join(REPORT_BASE_PATH + filename)):
-        with open(os.path.join(REPORT_BASE_PATH + filename), 'x') as jsonFile:
+    if not os.path.exists(os.path.join(REPORT_BASE_PATH, filename)):
+        with open(os.path.join(REPORT_BASE_PATH, filename), 'x') as jsonFile:
             data = []
             json.dump(data, jsonFile, indent=2)
         return JSONResponse(content=f"Report named {filename} created",status_code=200)
@@ -55,11 +55,11 @@ def get_report(
     filename: str = 'report.json',
     http_request: Request
 ) -> Any:
-
-    if not os.path.exists(os.path.join(REPORT_BASE_PATH + filename)):
+    logging.info(os.path.join(REPORT_BASE_PATH, filename))
+    if not os.path.exists(os.path.join(REPORT_BASE_PATH, filename)):
         return JSONResponse(content="File not Found",status_code=404)
     
-    report_path = os.path.abspath(os.path.join(REPORT_BASE_PATH + filename))
+    report_path = os.path.abspath(os.path.join(REPORT_BASE_PATH, filename))
 
     return FileResponse(report_path,filename=filename)
 
@@ -69,7 +69,7 @@ def delete_report(
     filename: str = 'report.json',
     http_request: Request
 ) -> Any:
-    if os.path.exists(os.path.join(REPORT_BASE_PATH + filename)):
-        os.remove(os.path.join(REPORT_BASE_PATH + filename))
+    if os.path.exists(os.path.join(REPORT_BASE_PATH, filename)):
+        os.remove(os.path.join(REPORT_BASE_PATH, filename))
         return JSONResponse(content="Report deleted",status_code=200)
     return JSONResponse(content="File not Found",status_code=404)
