@@ -27,7 +27,7 @@ debug-upd:
 	$(call docker_compose_cmd) --profile debug up -d
 
 down:
-	$(call docker_compose_cmd) --profile devdown
+	$(call docker_compose_cmd) --profile dev down
 
 down-v: # also removes volumes
 	$(call docker_compose_cmd) --profile dev down -v
