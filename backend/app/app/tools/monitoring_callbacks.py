@@ -13,7 +13,6 @@ def location_callback(ue, callbackurl, subscription):
         "enodeBId": ue.get("gnb_id_hex"),
         "lat": ue.get("latitude"),
         "lon": ue.get("longitude"),
-
     }
     })
     headers = {
