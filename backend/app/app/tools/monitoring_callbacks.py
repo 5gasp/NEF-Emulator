@@ -10,7 +10,10 @@ def location_callback(ue, callbackurl, subscription):
     "monitoringType": "LOCATION_REPORTING",
     "locationInfo": {
         "cellId": ue.get("cell_id_hex"),
-        "enodeBId": ue.get("gnb_id_hex")
+        "enodeBId": ue.get("gnb_id_hex"),
+        "lat": ue.get("latitude"),
+        "lon": ue.get("longitude"),
+
     }
     })
     headers = {
