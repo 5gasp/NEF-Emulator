@@ -77,6 +77,7 @@ def create_UE(
     json_data['ip_address_v4'] = str(item_in.ip_address_v4)
     json_data['ip_address_v6'] = str(item_in.ip_address_v6.exploded)
     json_data['Cell_id'] = None
+    json_data['path_id'] = 0
 
     UE = crud.ue.create_with_owner(db=db, obj_in=json_data, owner_id=current_user.id)
     json_data.update({"path_id" : 0})
