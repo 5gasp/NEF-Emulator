@@ -31,6 +31,7 @@ class UE(Base):
     latitude = Column(Float, index=True)
     longitude = Column(Float, index=True)
     path_id = Column(Integer, index=True)
+    is_simulated = Column(Boolean, default=True, index=True)
 
     #Foreign Keys
     owner_id = Column(Integer, ForeignKey("user.id"))
