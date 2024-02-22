@@ -1,25 +1,114 @@
-
-#mapid {width: 100%; }
+#mapid {
+    width: 100%;
+}
 
 .emu-pin-box {}
-.emu-pin-box .pin-bg {width: 28px; height: 28px; border-radius: 50% 50% 50% 0; position: absolute; transform: rotate(-45deg); left: 50%; top: 50%; margin: -15px 0 0 -15px; border: 1px solid #00a3cc; background: #00ccff; box-sizing: content-box;}
-.emu-pin-box .pin-bg:after {content: ''; width: 24px; height: 24px; margin: 2px 0 0 2px; background: #ffffff; position: absolute; border-radius: 50%;}
-.emu-pin-box .pin-bg-red {background: #c11515; border-color: #8a1818;}
-.emu-pin-box .pin-icon {position: absolute; width: 30px !important; height: 42px !important; font-size: 18px !important; left: 0; top: 8px; text-align: center;}
-.emu-pin-box .pin-text {position: absolute; width: 30px; height: 42px; font-size: 8px; left: 6px; top: 10px; font-weight: 600;}
 
-.null-cell .pin-bg { background: #cad2d3; border-color: #cad2d3; }
+.emu-pin-box .pin-bg {
+    width: 28px;
+    height: 28px;
+    border-radius: 50% 50% 50% 0;
+    position: absolute;
+    transform: rotate(-45deg);
+    left: 50%;
+    top: 50%;
+    margin: -15px 0 0 -15px;
+    border: 1px solid #00a3cc;
+    background: #00ccff;
+    box-sizing: content-box;
+}
 
-.select-wrapper {display: inline-block; float: right;}
-.select-wrapper select {display: inline; width: auto; height: 24px; font-size: 11px;}
+.emu-pin-box .pin-bg:after {
+    content: '';
+    width: 24px;
+    height: 24px;
+    margin: 2px 0 0 2px;
+    background: #ffffff;
+    position: absolute;
+    border-radius: 50%;
+}
 
-.dt-filter-wrapper {display: inline-block; float: right; margin-right: 50px;}
-.dt-filter-wrapper input {display: inline; width: auto; height: 24px; font-size: 11px; border: 1px solid #b1b7c1; border-radius: 0.25rem; }
-.dt-filter-wrapper input:focus-visible { outline: 1px solid #ebebeb; }
-.row .dataTables_filter { display: none; }
+.emu-pin-box .pin-bg-red {
+    background: #c11515;
+    border-color: #8a1818;
+}
+
+.emu-pin-box .pin-bg-green {
+    background: #3ac115;
+    border-color: #348a18;
+}
+
+.emu-pin-box .pin-icon {
+    position: absolute;
+    width: 30px !important;
+    height: 42px !important;
+    font-size: 18px !important;
+    left: 0;
+    top: 8px;
+    text-align: center;
+}
+
+.emu-pin-box .pin-text {
+    position: absolute;
+    width: 30px;
+    height: 42px;
+    font-size: 8px;
+    left: 6px;
+    top: 10px;
+    font-weight: 600;
+}
+
+.null-cell .pin-bg {
+    background: #cad2d3;
+    border-color: #cad2d3;
+}
+
+.select-wrapper {
+    display: inline-block;
+    float: right;
+}
+
+.select-wrapper select {
+    display: inline;
+    width: auto;
+    height: 24px;
+    font-size: 11px;
+}
+
+.dt-filter-wrapper {
+    display: inline-block;
+    float: right;
+    margin-right: 50px;
+}
+
+.dt-filter-wrapper input {
+    display: inline;
+    width: auto;
+    height: 24px;
+    font-size: 11px;
+    border: 1px solid #b1b7c1;
+    border-radius: 0.25rem;
+}
+
+.dt-filter-wrapper input:focus-visible {
+    outline: 1px solid #ebebeb;
+}
+
+.row .dataTables_filter {
+    display: none;
+}
 
 
-.row table.dataTable thead th {border-bottom: none;}
-.row table.dataTable.no-footer {border-bottom: none; font-size: 14px;}
+.row table.dataTable thead th {
+    border-bottom: none;
+}
 
-.pre-body {max-height: 340px; background: #f5f5f5;}
+.row table.dataTable.no-footer {
+    border-bottom: none;
+    font-size: 14px;
+}
+
+.pre-body {
+    max-height: 340px;
+    background: #f5f5f5;
+}
