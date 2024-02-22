@@ -84,8 +84,6 @@ services:
       - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
     env_file:
       - .env
-    networks:
-      - rabbitmq_net
 
   backend:
     image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
