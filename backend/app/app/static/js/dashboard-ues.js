@@ -547,7 +547,7 @@ function ui_show_edit_UE_modal(UE_supi) {
         $('#edit_UE_path').append($('<option>', data));
     });
 
-    // Show/hide related to flag
+    // Show/hide section
     $(".edit-sim-section").toggle(edit_UE_tmp_obj.is_simulated);
 
 
