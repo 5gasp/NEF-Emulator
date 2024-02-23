@@ -44,3 +44,7 @@ MONGO_EXPRESS_ENABLE_ADMIN=true
 
 #Report
 REPORT_PATH=/shared/report.json
+
+# RabbitMQ
+RABBITMQ_DEFAULT_USER=user
+RABBITMQ_DEFAULT_PASS=pass
