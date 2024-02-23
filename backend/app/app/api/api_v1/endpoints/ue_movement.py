@@ -66,6 +66,10 @@ class BackgroundTasks(threading.Thread):
                 logging.warning("Not enough permissions")
                 threads.pop(f"{supi}")
                 return
+            if (UE.is_simulated != True):
+                logging.warning("Trying to simulate a real UE")
+                threads.pop(f"{supi}")
+                return
             
             #Insert running UE in the dictionary
 
