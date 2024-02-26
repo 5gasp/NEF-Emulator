@@ -10,7 +10,7 @@ from app.api import deps
 from app import tools
 from app.db.session import client
 from app.api.api_v1.endpoints.utils import add_notifications
-from .ue_movement import retrieve_ue_state, retrieve_ue
+from .sim_ue_movement import retrieve_ue_state, retrieve_ue
 from .utils import ReportLogging
 
 router = APIRouter()

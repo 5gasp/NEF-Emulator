@@ -8,7 +8,6 @@ from app import crud, models, schemas
 from app.api import deps
 from app.api.api_v1.endpoints.utils import retrieve_ue_state
 from app.api.api_v1.endpoints.paths import get_random_point
-from app.api.api_v1.endpoints.ue_movement import retrieve_ue, retrieve_ue_distances, retrieve_ue_path_losses, retrieve_ue_rsrps, retrieve_ue_handovers
 from .utils import ReportLogging
 
 router = APIRouter()
