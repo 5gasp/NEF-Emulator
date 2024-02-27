@@ -19,7 +19,8 @@ class UEBase(BaseModel):
     mcc: Optional[int] = Field(default=202, description="Mobile Country Code (MCC) part of the Public Land Mobile Network (PLMN), comprising 3 digits, as defined in clause 9.3.3.5 of 3GPP TS 38.413")
     mnc: Optional[int] = Field(default=1, description="Mobile Network Code (MNC) part of the Public Land Mobile Network (PLMN), comprising 2 or 3 digits, as defined in clause 9.3.3.5 of 3GPP TS 38.413")
     external_identifier: Optional[str] = Field("123456789@domain.com", description="Globally unique identifier containing a Domain Identifier and a Local Identifier. \<Local Identifier\>@\<Domain Identifier\>")
-    speed: Speed = Field(default="LOW", description="This value describes UE's speed. Possible values are \"STATIONARY\" (e.g, IoT device), \"LOW(e.g, pedestrian)\" and \"HIGH (e.g., vehicle)\"")
+    speed: Optional[Speed] = Field(description="This value describes UE's speed. Possible values are \"STATIONARY\" (e.g, IoT device), \"LOW(e.g, pedestrian)\" and \"HIGH (e.g., vehicle)\"")
+    is_simulated: Optional[bool] = Field(default=True, description="Flag identifying simulated US's from real ones")
 
 class UECreate(UEBase):
     supi: constr(regex=r'^[0-9]{15,16}$') = Field(default="202010000000000", description= """String identifying a Supi that shall contain either an IMSI, a network specific identifier, a Global Cable Identifier (GCI) or a Global Line Identifier (GLI) as specified in clause 2.2A of 3GPP TS 23.003. 

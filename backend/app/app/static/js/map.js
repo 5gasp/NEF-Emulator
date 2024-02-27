@@ -392,14 +392,18 @@ function ui_map_paint_UEs() {
     // console.log(ues);
 
     for (const ue of ues) {
+        // skip if coordinates are missing
+        if (!ue.longitude || !ue.latitude) { continue; }
+
         // create markers - this will be executed only once!
+        var real_ue = ue.is_simulated ? '' : ' pin-bg-green'
         var walk_icon = L.divIcon({
             className: 'emu-pin-box',
             iconSize: L.point(30,42),
             iconAnchor: L.point(15,42),
             popupAnchor: L.point(0,-38),
             tooltipAnchor: L.point(0,0),
-            html: '<div class="pin-bg pin-bg-walk"></div>\
+            html: '<div class="pin-bg pin-bg-walk' + real_ue + '"></div>\
                    <div class="pin-icon ion-md-walk"></div>'
         });
         
