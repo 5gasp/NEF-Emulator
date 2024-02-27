@@ -229,7 +229,7 @@ function api_post_UE_callback(UE_obj, callback) {
 // 
 // 
 function api_get_state_loop_for(UE_supi) {
-    var url = app.api_url + '/sim_ue_movement/state-loop/' + UE_supi;
+    var url = app.api_url + '/ue_movement/state-loop/' + UE_supi;
 
     $.ajax({
         type: 'GET',
@@ -403,7 +403,7 @@ function ui_add_btn_listeners_for_UEs_CUD_operations() {
             name: $('#add_UE_name').val(),
             external_identifier: $('#add_UE_ext_id').val(),
             description: $('#add_UE_description').val(),
-            is_simulated: $('#add_UE_is_simulated').prop('checked'),
+            is_simulated: !$('#add_UE_real').prop('checked'),
             // network
             ip_address_v4: $('#add_UE_ipv4').val(),
             ip_address_v6: $('#add_UE_ipv6').val(),
@@ -424,7 +424,7 @@ function ui_add_btn_listeners_for_UEs_CUD_operations() {
         }
 
         // Toggle checkbox and hidden section
-        $('#add_UE_is_simulated').prop('checked', "true");
+        $('#add_UE_real').prop('checked', "false");
         $(".add-sim-section").toggle(true);
 
         add_UE_modal.hide();
@@ -463,7 +463,7 @@ function ui_add_btn_listeners_for_UEs_CUD_operations() {
         edit_UE_tmp_obj.ip_address_v6 = $('#edit_UE_ipv6').val();
         edit_UE_tmp_obj.mac_address = $('#edit_UE_mac').val();
 
-        if (edit_UE_tmp_obj.is_simulated == true) {
+        if (edit_UE_tmp_obj.is_simulated) {
             // location & path
             edit_UE_tmp_obj.path_id = assign_path_id;
             edit_UE_tmp_obj.speed = $('#edit_UE_speed').val();
@@ -732,8 +732,8 @@ function ui_edit_UE_modal_add_listeners() {
 
 
 function ui_add_UE_modal_add_listeners() {
-    $("#add_UE_is_simulated").change(function () {
-        $(".add-sim-section").toggle(this.checked);
+    $("#add_UE_real").change(function () {
+        $(".add-sim-section").toggle(!this.checked);
     });
 
     $('#add_UE_path').on('change', function () {

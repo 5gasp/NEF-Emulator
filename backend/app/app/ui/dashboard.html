@@ -755,8 +755,12 @@
                   <!-- --------------------------------- -->
                   <div class="mb-4">
                     <div class="form-check">
-                      <label class="form-check-label" for="add_UE_is_simulated">UE simulated?</label>
-                      <input class="form-check-input" type="checkbox" id="add_UE_is_simulated" checked>
+                      <label class="form-check-label" for="add_UE_real">Consumes real-time location data</label>
+                      <input class="form-check-input" type="checkbox" id="add_UE_real">
+                    </div>
+                    <div class="small-text mt-2 alert alert-warning">
+                      If this check-box is checked, it means that the created UE will receive live location updates via a message bus.
+                      Therefore, no location coordinates will be simulated for this UE.
                     </div>
                   </div>
                   <!-- --------------------------------- -->

@@ -11,7 +11,7 @@ from app.api import deps
 from app.schemas import monitoringevent, UserPlaneNotificationData
 from pydantic import BaseModel
 from app.api.api_v1.endpoints.paths import get_random_point
-from app.api.api_v1.endpoints.sim_ue_movement import retrieve_ue_state
+from app.api.api_v1.endpoints.ue_movement import retrieve_ue_state
 from fastapi.routing import APIRoute
 from json import JSONDecodeError
 from app.core.config import settings
