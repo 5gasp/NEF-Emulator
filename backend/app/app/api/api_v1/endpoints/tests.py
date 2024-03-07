@@ -1,14 +1,9 @@
-from typing import Any, List
+from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Path
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
-from sqlalchemy import null
 from sqlalchemy.orm import Session
-from app import crud, models, schemas
+from app import crud, models
 from app.api import deps
-from app.api.api_v1.endpoints.utils import retrieve_ue_state
-from app.api.api_v1.endpoints.paths import get_random_point
-from app.api.api_v1.endpoints.ue_movement import retrieve_ue, retrieve_ue_distances, retrieve_ue_path_losses, retrieve_ue_rsrps, retrieve_ue_handovers
+from app.tools.ue_movement_utils.common import retrieve_ue, retrieve_ue_distances, retrieve_ue_path_losses, retrieve_ue_rsrps, retrieve_ue_handovers
 from .utils import ReportLogging
 
 router = APIRouter()

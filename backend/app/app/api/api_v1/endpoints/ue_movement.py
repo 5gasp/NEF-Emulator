@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Path, Depends, HTTPException
 from typing import Any
-from app import tools, models
-from app.tools.ue_movement_utils import *
+from app import models
 from app.api import deps
 from app.schemas import Msg
+from app.tools.ue_movement_utils.common import threads, ues, retrieve_ue_state
+from app.tools.ue_movement_utils import BackgroundTasks
 
 
 # API
