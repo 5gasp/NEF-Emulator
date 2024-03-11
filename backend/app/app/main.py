@@ -1,8 +1,10 @@
 from fastapi import FastAPI, Request
 from starlette.middleware.cors import CORSMiddleware
 from app.api.api_v1.api import api_router, nef_router, tests_router
+from app.tools.ue_movement_utils.real_ue import consume_from_rabbitmq
 from app.core.config import settings
 import time
+from threading import Thread
 
 # imports for UI
 from fastapi.staticfiles import StaticFiles
@@ -102,3 +104,9 @@ async def export(request: Request):
 @app.get("/import", response_class=HTMLResponse)
 async def import_page(request: Request):
     return templates.TemplateResponse("import.html", {"request": request})
+
+# ================================= RabbitMQ consumer =================================
+
+rabbitmq_thread = Thread(target=consume_from_rabbitmq)
+rabbitmq_thread.daemon = True
+rabbitmq_thread.start()
