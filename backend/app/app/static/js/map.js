@@ -27,7 +27,7 @@ var map_bounds   = [];
 
 // for UE & map refresh
 var UE_refresh_interval    = null;
-var UE_refresh_sec_default = 1000; // 1 sec
+var UE_refresh_sec_default = 5000; // 5 sec
 var UE_refresh_sec         = -1;   // when select = "off" AND disabled = true
 
 // template for UE buttons
@@ -127,6 +127,7 @@ $( document ).ready(function() {
     api_get_all_monitoring_events();
     start_events_refresh_interval();
     ui_add_select_listener_events_reload();
+    start_map_refresh_interval();
 
 
     // in case the header-toggle button is pressed,
@@ -183,7 +184,7 @@ function stop_map_refresh_interval() {
     UE_refresh_interval = null;
     
     // disable the select button
-    $('.map-reload-select').prop("disabled",true);
+    // $('.map-reload-select').prop("disabled",true);
     // UE_refresh_sec = 0;
     // $('.map-reload-select').val(0);
 }
@@ -224,7 +225,7 @@ function start_events_refresh_interval() {
     if (events_refresh_interval == null) {
 
         // start updating
-        events_refresh_interval = setInterval(function(){ 
+        events_refresh_interval = setInterval(function(){
             api_get_last_monitoring_events();
         }, events_refresh_sec);
 
@@ -397,6 +398,7 @@ function ui_map_paint_UEs() {
 
         // create markers - this will be executed only once!
         var real_ue = ue.is_simulated ? '' : ' pin-bg-green'
+        var speed = ue.speed ? "Speed: " + ue.speed : "";
         var walk_icon = L.divIcon({
             className: 'emu-pin-box',
             iconSize: L.point(30,42),
@@ -406,7 +408,7 @@ function ui_map_paint_UEs() {
             html: '<div class="pin-bg pin-bg-walk' + real_ue + '"></div>\
                    <div class="pin-icon ion-md-walk"></div>'
         });
-        
+
         ue_markers[ue.supi] = L.marker([ue.latitude,ue.longitude], {icon: walk_icon}).addTo(mymap)
             .bindTooltip(ue.ip_address_v4)
             .bindPopup("<b>"+ ue.name +"</b><br />"+
@@ -414,7 +416,7 @@ function ui_map_paint_UEs() {
                        "location: ["  + ue.latitude.toFixed(6) + "," + ue.longitude.toFixed(6) +"]<br />"+
                        "Cell ID: " + ( (ue.cell_id_hex==null)? "-" : ue.cell_id_hex ) +"<br />"+
                        "External identifier: " + ue.external_identifier +"<br />"+
-                       "Speed:"+ ue.speed)
+                       speed)
             .addTo(ues_lg); // add to layer group
 
         if ( ue.cell_id_hex==null ) {
@@ -439,16 +441,18 @@ function ui_map_paint_moving_UEs() {
     for(var key in moving_ues) {
     
         var ue = moving_ues[key];
+        var speed = ue.speed ? "Speed: " + ue.speed : "";
             
         // move existing markers
         var newLatLng = [ue.latitude,ue.longitude];
         ue_markers[ue.supi].setLatLng(newLatLng);
+
         ue_markers[ue.supi].setPopupContent("<b>"+ ue.name +"</b><br />"+
                        // ue.description +"<br />"+
                        "location: ["  + ue.latitude.toFixed(6) + "," + ue.longitude.toFixed(6) +"]<br />"+
                        "Cell ID: " + ( (ue.cell_id_hex==null)? "-" : ue.cell_id_hex ) +"<br />"+
                        "External identifier: " + ue.external_identifier +"<br />"+
-                       "Speed:"+ ue.speed);
+                       speed);
 
 
         // update UE marker color
@@ -717,7 +721,7 @@ function api_stop_loop( ue ) {
             if (looping_UEs == 0) {
                 $('#btn-start-all').addClass('btn-success').removeClass('btn-danger');
                 $('#btn-start-all').text("Start all");
-                stop_map_refresh_interval();
+                // stop_map_refresh_interval();
             }
         },
         error: function(err)
@@ -851,7 +855,7 @@ function ui_add_ue_all_btn_listener() {
                 api_stop_loop(ue);
             }
 
-            stop_map_refresh_interval();
+            // stop_map_refresh_interval();
 
             $(this).text("Start all");
         }
