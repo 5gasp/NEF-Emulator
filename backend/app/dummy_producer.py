@@ -25,7 +25,7 @@ def publish_to_rabbitmq(message):
     except Exception as e:
         print("Error publishing message to RabbitMQ:", e)
 
-def simulate_movement(supi, initial_lat, initial_lon, update_interval=1, lat_increment=0.001, lon_increment=0.001):
+def simulate_movement(supi, initial_lat, initial_lon, update_interval=1, lat_increment=0.00001, lon_increment=0.00001):
     lat = initial_lat
     lon = initial_lon
 
