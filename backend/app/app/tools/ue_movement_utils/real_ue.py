@@ -23,11 +23,11 @@ def callback(ch, method, properties, body):
         if UE and ~UE.is_simulated:
             UE.latitude = lat
             UE.longitude = lon
-            db.commit()
 
             ues[f"{supi}"] = jsonable_encoder(UE)
-            # ues[f"{supi}"].pop("id")
+            ues[f"{supi}"].pop("id")
 
+            db.commit()
             logging.info(f"Updated UE {supi} with latitude: {lat}, longitude: {lon}")
 
     except Exception as e:
