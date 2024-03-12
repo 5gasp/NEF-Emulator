@@ -16,7 +16,6 @@ def callback(ch, method, properties, body):
         lat = data.get('lat')
         lon = data.get('lon')
 
-        # Update the database with lat and lon fields
         db = SessionLocal()
         UE = crud.ue.get_supi(db=db, supi=supi)
 

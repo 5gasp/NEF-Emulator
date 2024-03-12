@@ -34,7 +34,6 @@ def initiate_movement(
     threads[f"{msg.supi}"] = {}
     threads[f"{msg.supi}"][f"{current_user.id}"] = t
     t.start()
-    # print(threads)
     return {"msg": "Loop started"}
 
 
