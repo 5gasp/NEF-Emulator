@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path
 from sqlalchemy.orm import Session
 from app import crud, models
 from app.api import deps
-from app.tools.ue_movement_utils.common import retrieve_ue, retrieve_ue_distances, retrieve_ue_path_losses, retrieve_ue_rsrps, retrieve_ue_handovers
+from app.tools.ue_movement_utils.common import retrieve_ue, retrieve_ue_distances, retrieve_ue_path_losses, retrieve_ue_rsrps
 from .utils import ReportLogging
 
 router = APIRouter()
@@ -77,17 +77,3 @@ def read_UE_rsrps(*,
     if not crud.user.is_superuser(current_user) and (UE.owner_id != current_user.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     return retrieve_ue_rsrps(supi)
-
-@router.get("/{supi}/handovers")
-def read_UE_handovers(*,
-    db: Session = Depends(deps.get_db),
-    supi: str = Path(...,
-                     description="The SUPI of the UE you want to retrieve"),
-    current_user: models.User = Depends(deps.get_current_active_user),
-) -> Any:
-    UE = crud.ue.get_supi(db=db, supi=supi)
-    if not UE:
-        raise HTTPException(status_code=404, detail="UE not found")
-    if not crud.user.is_superuser(current_user) and (UE.owner_id != current_user.id):
-        raise HTTPException(status_code=400, detail="Not enough permissions")
-    return retrieve_ue_handovers(supi)
