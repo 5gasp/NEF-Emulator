@@ -73,13 +73,13 @@ def consume_from_rabbitmq():
         connection = pika.BlockingConnection(parameters)
         channel = connection.channel()
 
-        channel.exchange_declare(exchange="topic_exchange", exchange_type="topic")
+        channel.exchange_declare(exchange="ue_coordinates", exchange_type="topic")
 
         result = channel.queue_declare("", exclusive=True)
         queue_name = result.method.queue
 
         channel.queue_bind(
-            exchange="topic_exchange", queue=queue_name, routing_key="gps_data"
+            exchange="ue_coordinates", queue=queue_name, routing_key="gps_data"
         )
 
         channel.basic_consume(

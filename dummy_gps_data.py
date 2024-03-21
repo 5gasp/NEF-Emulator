@@ -22,9 +22,9 @@ def publish_to_rabbitmq(connection, message):
     try:
         channel = connection.channel()
 
-        channel.exchange_declare(exchange="topic_exchange", exchange_type="topic")
+        channel.exchange_declare(exchange="ue_coordinates", exchange_type="topic")
         channel.basic_publish(
-            exchange="topic_exchange", routing_key="gps_data", body=json.dumps(message)
+            exchange="ue_coordinates", routing_key="gps_data", body=json.dumps(message)
         )
 
         print(" [x] Sent message:", message)
