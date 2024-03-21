@@ -24,7 +24,6 @@ def callback(ch, method, properties, body):
 
         db = SessionLocal()
         UE = crud.ue.get_supi(db=db, supi=supi)
-
         if UE and ~UE.is_simulated:
             try:
                 UE.longitude = lon
@@ -36,10 +35,10 @@ def callback(ch, method, properties, body):
                 cells = get_cells(db=db, owner_id=user_id)
                 cell_now, distances_now = check_distance(lat, lon, cells)
 
-                if cell_now and cell_now != UE.Cell_id:
-                    ues[f"{supi}"]["cell_id_hex"] = UE.Cell.cell_id
-                    ues[f"{supi}"]["gnb_id_hex"] = UE.Cell.gNB.gNB_id
-                    ues[f"{supi}"]["Cell_id"] = UE.Cell_id
+                if cell_now and cell_now["cell_id"] != UE.Cell_id:
+                    ues[f"{supi}"]["cell_id_hex"] = cell_now["cell_id"]
+                    ues[f"{supi}"]["gnb_id_hex"] = cell_now["gNB_id"]
+                    ues[f"{supi}"]["Cell_id"] = cell_now["id"]
                 else:
                     ues[f"{supi}"]["cell_id_hex"] = None
                     ues[f"{supi}"]["gnb_id_hex"] = None
