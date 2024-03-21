@@ -154,6 +154,9 @@ To use a UE with real-time location data, follow these instructions:
 
 The script will start publishing GPS coordinates to RabbitMQ.
 
+
+> Note: When running the script in a different machine, change the `host` in the connection parameters to the IP of the machine running the NEF Emulator
+
 ---
 
 ## ↔️ NetApp communication options
