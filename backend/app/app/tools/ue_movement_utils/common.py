@@ -1,5 +1,6 @@
-from app import crud, tools
 from fastapi.encoders import jsonable_encoder
+
+from app import crud, tools
 
 # Dictionary holding threads that are running per user id.
 threads = {}
@@ -16,7 +17,12 @@ path_losses = {}
 # Dictionary holding UEs' path losses in reference to cells
 rsrps = {}
 
-handovers = {}
+subscriptions = {
+    "location_reporting": False,
+    "ue_reachability": False,
+    "loss_of_connectivity": False,
+    "as_session_with_qos": False,
+}
 
 
 def get_cells(db, owner_id):
@@ -55,13 +61,6 @@ def retrieve_ue_path_losses(supi: str) -> dict:
 
 def retrieve_ue_rsrps(supi: str) -> dict:
     return rsrps.get(supi)
-
-
-def retrieve_ue_handovers(supi: str) -> dict:
-    result = handovers.get(supi)
-    if result != None:
-        return handovers.get(supi)
-    return []
 
 
 def monitoring_event_sub_validation(

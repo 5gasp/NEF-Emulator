@@ -119,6 +119,45 @@ Replace `supi` with the UE ID from the emulator.
 
 ---
 
+## UEs with Real-Time Location Data
+
+In this fork, we implemented a way to inject UE coordinates via RabbitMQ. This way, the platform can show both simulated and real UEs.
+
+### Usage Instructions
+
+To use a UE with real-time location data, follow these instructions:
+
+1. Create a non-simulated UE by checking the "Consumes real-time location data" checkbox (UI), or by setting the `is_simulated` flag set as `False` (endpoint)
+2. Create a script (example bellow) that connects to the RabbitMQ bus and produces messages to the `ue_coordinates` topic with a JSON containing the fields:
+    - supi
+    - lat
+    - lon
+
+### Example (Simulating UE GPS Coordinates)
+#### Prerequisites
+
+- Python
+- Pika (`pip install pika`)
+
+#### Usage
+
+   ```
+   python dummy_gps_data.py --supi <SUPI> --initial_lat <LATITUDE> --initial_lon <LONGITUDE> --update_interval <UPDATE_INTERVAL> --lat_increment <LATITUDE_INC> --lon_increment <LONGITUDE_INC>
+   ```
+
+   - `--supi`: The Subscriber Permanent Identifier (SUPI) value. (default: `202010000000009`)
+   - `--initial_lat`: The initial latitude of the UE. (default: `37.998202`)
+   - `--initial_lon`: The initial longitude of the UE. (default: `23.819648`)
+   - `--update_interval`: The interval (in seconds) between each update of the GPS coordinates. (default: `1`)
+   - `--lat_increment`: The increment for latitude in each update. (default: `0.0001`)
+   - `--lon_increment`: The increment for longitude in each update. (default: `0.0001`)
+
+The script will start publishing GPS coordinates to RabbitMQ.
+
+
+> Note: When running the script in a different machine, change the `host` in the connection parameters to the IP of the machine running the NEF Emulator
+
+---
 
 ## ↔️ NetApp communication options
 

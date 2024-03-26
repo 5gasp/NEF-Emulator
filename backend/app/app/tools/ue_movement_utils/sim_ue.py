@@ -1,12 +1,17 @@
-import threading, logging, time, requests
+import logging
+import threading
+import time
+
+import requests
 from fastapi.encoders import jsonable_encoder
-from app.tools import qos_callback
-from app.db.session import SessionLocal, client
-from app.crud import crud_mongo
-from app.tools.distance import check_distance
-from app.tools.rsrp_calculation import check_rsrp, check_path_loss
+
 from app import crud
-from app.tools import monitoring_callbacks, timer
+from app.crud import crud_mongo
+from app.db.session import SessionLocal, client
+from app.tools import monitoring_callbacks, qos_callback, timer
+from app.tools.distance import check_distance
+from app.tools.rsrp_calculation import check_path_loss, check_rsrp
+
 from .common import *
 
 
@@ -25,13 +30,7 @@ class BackgroundTasks(threading.Thread):
         current_user = self._args[0]
         supi = self._args[1]
 
-        active_subscriptions = {
-            "location_reporting": False,
-            "ue_reachability": False,
-            "loss_of_connectivity": False,
-            "as_session_with_qos": False,
-        }
-
+        active_subscriptions = subscriptions
         try:
             db_mongo = client.fastapi
 
@@ -45,18 +44,17 @@ class BackgroundTasks(threading.Thread):
                 logging.warning("Not enough permissions")
                 threads.pop(f"{supi}")
                 return
-            if UE.is_simulated != True:
+            if not UE.is_simulated:
                 logging.warning("Trying to simulate a real UE")
                 threads.pop(f"{supi}")
                 return
 
             # Insert running UE in the dictionary
 
-            global ues, distances, handovers
             ues[f"{supi}"] = jsonable_encoder(UE)
             ues[f"{supi}"].pop("id")
 
-            if UE.Cell_id != None:
+            if UE.Cell_id is not None:
                 ues[f"{supi}"]["cell_id_hex"] = UE.Cell.cell_id
                 ues[f"{supi}"]["gnb_id_hex"] = UE.Cell.gNB.gNB_id
             else:
@@ -95,7 +93,7 @@ class BackgroundTasks(threading.Thread):
                 points [ 1 2 3 4 5 6 7 8 9 10 ... ] . . . . . . .
                          ^ current index
                          ^  moving index                ^ moving can also reach here
-                 
+
             current: shows where the UE is
             moving : starts within the range of len(points) and keeps increasing.
                      When it goes out of these bounds, the MOD( len(points) ) prevents
@@ -259,7 +257,7 @@ class BackgroundTasks(threading.Thread):
                     active_subscriptions.update({"as_session_with_qos": False})
                 # As Session With QoS API - search for active subscription in db
 
-                if cell_now != None:
+                if cell_now is not None:
                     try:
                         t.stop()
                         loss_of_connectivity_ack = "FALSE"
@@ -271,7 +269,7 @@ class BackgroundTasks(threading.Thread):
 
                     # Monitoring Event API - UE reachability
                     # check if the ue was disconnected before
-                    if ues[f"{supi}"]["Cell_id"] == None:
+                    if ues[f"{supi}"]["Cell_id"] is None:
 
                         if not active_subscriptions.get("ue_reachability"):
                             ue_reachability_sub = crud_mongo.read_by_multiple_pairs(
@@ -345,13 +343,8 @@ class BackgroundTasks(threading.Thread):
                     # Monitoring Event API - UE reachability
 
                     logging.warning(
-                        f"UE({UE.supi}) with ipv4 {UE.ip_address_v4} handovers to Cell {cell_now.get('id')}, {cell_now.get('description')}"
+                        f"UE({UE.supi}) with ipv4 {UE.ip_address_v4} connected to Cell {cell_now.get('id')}, {cell_now.get('description')}"
                     )
-
-                    if f"{UE.supi}" not in handovers.keys():
-                        handovers[f"{UE.supi}"] = []
-
-                    handovers[f"{UE.supi}"].append(cell_now.get("id"))
 
                     ues[f"{supi}"]["Cell_id"] = cell_now.get("id")
                     ues[f"{supi}"]["cell_id_hex"] = cell_now.get("cell_id")
@@ -427,7 +420,7 @@ class BackgroundTasks(threading.Thread):
                             logging.warning("Subscription has expired")
                     # Monitoring Event API - Location Reporting
 
-                    # As Session With QoS API - if EVENT_TRIGGER then send callback on handover
+                    # As Session With QoS API - if EVENT_TRIGGER then send callback
                     if active_subscriptions.get("as_session_with_qos"):
                         reporting_freq = qos_sub["qosMonInfo"]["repFreqs"]
                         if "EVENT_TRIGGERED" in reporting_freq:
@@ -437,7 +430,7 @@ class BackgroundTasks(threading.Thread):
                                 ues.copy(),
                                 ues[f"{supi}"],
                             )
-                    # As Session With QoS API - if EVENT_TRIGGER then send callback on handover
+                    # As Session With QoS API - if EVENT_TRIGGER then send callback
 
                 else:
                     # crud.ue.update(db=db, db_obj=UE, obj_in={"Cell_id" : None})
@@ -446,8 +439,7 @@ class BackgroundTasks(threading.Thread):
                         if rt is not None:
                             rt.stop()
                     except timer.TimerError as ex:
-                        # logging.critical(ex)
-                        pass
+                        logging.critical(ex)
 
                     ues[f"{supi}"]["Cell_id"] = None
                     ues[f"{supi}"]["cell_id_hex"] = None
@@ -498,11 +490,11 @@ class BackgroundTasks(threading.Thread):
                 points [ 1 2 3 4 5 6 7 8 9 10 ... ] . . . . . . .
                                ^ point
                            ^ flag
-                 
+
             flag:    it is used once to find the current UE position and then is
                      set to False
-            
-            Sleep/   
+
+            Sleep/
             Speed:   LOW : sleeps   1 sec and goes to the next point  (1m/sec)
                      HIGH: sleeps 0.1 sec and goes to the next point (10m/sec)
 
