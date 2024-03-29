@@ -89,16 +89,23 @@ def monitoring_event_sub_validation(
 
 
 def validate_location_reporting_sub(
-    active_subscriptions, current_user, is_superuser, supi, UE, db_mongo, location_reporting_sub=None
+    active_subscriptions,
+    current_user,
+    is_superuser,
+    supi,
+    UE,
+    db_mongo,
+    location_reporting_sub=None,
 ):
-    if not location_reporting_sub and not active_subscriptions.get("location_reporting"):
+    if not location_reporting_sub and not active_subscriptions.get(
+        "location_reporting"
+    ):
         location_reporting_sub = crud_mongo.read_by_multiple_pairs(
             db_mongo,
             "MonitoringEvent",
             externalId=UE.external_identifier,
             monitoringType="LOCATION_REPORTING",
         )
-        logging.info(f"Location Reporting Sub: {location_reporting_sub}")
         if location_reporting_sub:
             active_subscriptions.update({"location_reporting": True})
 

@@ -363,9 +363,6 @@ class BackgroundTasks(threading.Thread):
                                 externalId=UE.external_identifier,
                                 monitoringType="LOCATION_REPORTING",
                             )
-                            logging.info(
-                                f"Location Reporting Sub: {location_reporting_sub}"
-                            )
                             if location_reporting_sub:
                                 active_subscriptions.update(
                                     {"location_reporting": True}
