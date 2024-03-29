@@ -6,11 +6,10 @@ import pika
 from fastapi.encoders import jsonable_encoder
 
 from app import crud
-from app.db.session import SessionLocal
+from app.db.session import SessionLocal, client
 from app.tools.distance import check_distance
-from app.tools.rsrp_calculation import check_path_loss, check_rsrp
 
-from .common import get_cells, ues
+from .common import get_cells, subscriptions, ues, validate_location_reporting_sub
 
 logging.basicConfig(level=logging.INFO)
 
@@ -26,19 +25,36 @@ def callback(ch, method, properties, body):
         UE = crud.ue.get_supi(db=db, supi=supi)
         if UE and ~UE.is_simulated:
             try:
+                active_subscriptions = subscriptions.copy()
+                db_mongo = client.fastapi
                 UE.longitude = lon
                 UE.latitude = lat
                 ues[f"{supi}"] = jsonable_encoder(UE)
                 ues[f"{supi}"].pop("id")
 
-                user_id = UE.owner_id
-                cells = get_cells(db=db, owner_id=user_id)
+                current_user = UE.owner
+                is_superuser = crud.user.is_superuser(current_user)
+
+                cells = get_cells(db=db, owner_id=current_user.id)
                 cell_now, distances_now = check_distance(lat, lon, cells)
 
                 if cell_now and cell_now["cell_id"] != UE.Cell_id:
                     ues[f"{supi}"]["cell_id_hex"] = cell_now["cell_id"]
                     ues[f"{supi}"]["gnb_id_hex"] = cell_now["gNB_id"]
                     ues[f"{supi}"]["Cell_id"] = cell_now["id"]
+
+                    try:
+                        validate_location_reporting_sub(
+                            active_subscriptions,
+                            current_user,
+                            is_superuser,
+                            supi,
+                            UE,
+                            db_mongo,
+                        )
+                    except Exception as ex:
+                        logging.warning(ex)
+
                 else:
                     ues[f"{supi}"]["cell_id_hex"] = None
                     ues[f"{supi}"]["gnb_id_hex"] = None

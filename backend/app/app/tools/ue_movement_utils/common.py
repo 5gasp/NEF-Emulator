@@ -1,6 +1,11 @@
+import logging
+
+import requests
 from fastapi.encoders import jsonable_encoder
 
 from app import crud, tools
+from app.crud import crud_mongo
+from app.tools import monitoring_callbacks
 
 # Dictionary holding threads that are running per user id.
 threads = {}
@@ -81,3 +86,66 @@ def monitoring_event_sub_validation(
             return True
         else:
             return False
+
+
+def validate_location_reporting_sub(
+    active_subscriptions, current_user, is_superuser, supi, UE, db_mongo, location_reporting_sub=None
+):
+    if not location_reporting_sub and not active_subscriptions.get("location_reporting"):
+        location_reporting_sub = crud_mongo.read_by_multiple_pairs(
+            db_mongo,
+            "MonitoringEvent",
+            externalId=UE.external_identifier,
+            monitoringType="LOCATION_REPORTING",
+        )
+        logging.info(f"Location Reporting Sub: {location_reporting_sub}")
+        if location_reporting_sub:
+            active_subscriptions.update({"location_reporting": True})
+
+    # Validation of subscription
+    if active_subscriptions.get("location_reporting"):
+        sub_is_valid = monitoring_event_sub_validation(
+            location_reporting_sub,
+            is_superuser,
+            current_user,
+            location_reporting_sub.get("owner_id"),
+        )
+        if sub_is_valid:
+            try:
+                monitoring_callbacks.location_callback(
+                    ues[f"{supi}"],
+                    location_reporting_sub.get("notificationDestination"),
+                    location_reporting_sub.get("link"),
+                )
+
+                location_reporting_sub.update(
+                    {
+                        "maximumNumberOfReports": location_reporting_sub.get(
+                            "maximumNumberOfReports"
+                        )
+                        - 1
+                    }
+                )
+                crud_mongo.update(
+                    db_mongo,
+                    "MonitoringEvent",
+                    location_reporting_sub.get("_id"),
+                    location_reporting_sub,
+                )
+            except requests.exceptions.ConnectionError as ex:
+                logging.warning(ex)
+                crud_mongo.delete_by_uuid(
+                    db_mongo,
+                    "MonitoringEvent",
+                    location_reporting_sub.get("_id"),
+                )
+                active_subscriptions.update({"location_reporting": False})
+                raise Exception("Failed to send the callback request")
+        else:
+            crud_mongo.delete_by_uuid(
+                db_mongo,
+                "MonitoringEvent",
+                location_reporting_sub.get("_id"),
+            )
+            active_subscriptions.update({"location_reporting": False})
+            logging.warning("Subscription has expired")

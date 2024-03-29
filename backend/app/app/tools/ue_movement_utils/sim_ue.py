@@ -30,7 +30,7 @@ class BackgroundTasks(threading.Thread):
         current_user = self._args[0]
         supi = self._args[1]
 
-        active_subscriptions = subscriptions
+        active_subscriptions = subscriptions.copy()
         try:
             db_mongo = client.fastapi
 
@@ -353,72 +353,35 @@ class BackgroundTasks(threading.Thread):
 
                     # Monitoring Event API - Location Reporting
                     # Retrieve the subscription of the UE by external Id | This could be outside while true but then the user cannot subscribe when the loop runs
-                    if not active_subscriptions.get("location_reporting"):
-                        location_reporting_sub = crud_mongo.read_by_multiple_pairs(
-                            db_mongo,
-                            "MonitoringEvent",
-                            externalId=UE.external_identifier,
-                            monitoringType="LOCATION_REPORTING",
-                        )
-                        if location_reporting_sub:
-                            active_subscriptions.update({"location_reporting": True})
+                    # Monitoring Event API - Location Reporting
+                    try:
 
-                    # Validation of subscription
-                    if active_subscriptions.get("location_reporting"):
-                        sub_is_valid = monitoring_event_sub_validation(
-                            location_reporting_sub,
-                            is_superuser,
-                            current_user.id,
-                            location_reporting_sub.get("owner_id"),
-                        )
-                        if sub_is_valid:
-                            try:
-                                try:
-                                    monitoring_callbacks.location_callback(
-                                        ues[f"{supi}"],
-                                        location_reporting_sub.get(
-                                            "notificationDestination"
-                                        ),
-                                        location_reporting_sub.get("link"),
-                                    )
-                                    location_reporting_sub.update(
-                                        {
-                                            "maximumNumberOfReports": location_reporting_sub.get(
-                                                "maximumNumberOfReports"
-                                            )
-                                            - 1
-                                        }
-                                    )
-                                    crud_mongo.update(
-                                        db_mongo,
-                                        "MonitoringEvent",
-                                        location_reporting_sub.get("_id"),
-                                        location_reporting_sub,
-                                    )
-                                except timer.TimerError as ex:
-                                    # logging.critical(ex)
-                                    pass
-                            except requests.exceptions.ConnectionError as ex:
-                                logging.warning("Failed to send the callback request")
-                                logging.warning(ex)
-                                crud_mongo.delete_by_uuid(
-                                    db_mongo,
-                                    "MonitoringEvent",
-                                    location_reporting_sub.get("_id"),
-                                )
-                                active_subscriptions.update(
-                                    {"location_reporting": False}
-                                )
-                                continue
-                        else:
-                            crud_mongo.delete_by_uuid(
+                        if not active_subscriptions.get("location_reporting"):
+                            location_reporting_sub = crud_mongo.read_by_multiple_pairs(
                                 db_mongo,
                                 "MonitoringEvent",
-                                location_reporting_sub.get("_id"),
+                                externalId=UE.external_identifier,
+                                monitoringType="LOCATION_REPORTING",
                             )
-                            active_subscriptions.update({"location_reporting": False})
-                            logging.warning("Subscription has expired")
-                    # Monitoring Event API - Location Reporting
+                            logging.info(
+                                f"Location Reporting Sub: {location_reporting_sub}"
+                            )
+                            if location_reporting_sub:
+                                active_subscriptions.update(
+                                    {"location_reporting": True}
+                                )
+                        validate_location_reporting_sub(
+                            active_subscriptions,
+                            current_user,
+                            is_superuser,
+                            supi,
+                            UE,
+                            db_mongo,
+                            location_reporting_sub,
+                        )
+                    except Exception as ex:
+                        logging.warning(ex)
+                        continue
 
                     # As Session With QoS API - if EVENT_TRIGGER then send callback
                     if active_subscriptions.get("as_session_with_qos"):
